@@ -1,6 +1,7 @@
 import User from "../Database/scheme.database.js";
 import bcrypt from "bcryptjs"
-import { generateToken } from "./jwtToken.js";
+import { generateToken } from "../Components/jwtToken.js";
+import { zodValidation } from "../Components/zodValidation.js";
 
 export const signup = async(req, res) => {
     const fullname = req.body.fullname;
@@ -18,6 +19,14 @@ export const signup = async(req, res) => {
                 message : "Password must be atleast 6 characters."
             });
         }
+
+        const response = await zodValidation({ fullname, email, password });
+        if(!response.success){
+            return res.status(400).json({
+                message : "Input is incorrect"
+            })
+        }
+
         const existUser = await User.findOne({ email });
         if(existUser){
         return res.status(400).json({
@@ -58,3 +67,4 @@ export const signup = async(req, res) => {
     }
 
 };
+
